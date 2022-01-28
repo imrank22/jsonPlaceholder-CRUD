@@ -1,0 +1,15 @@
+<div class="container">
+    <div class="row">
+        
+        <div class="white-bg post-data">
+            <h5 class="mb-20">POST ID: {{ postDetail.id }}</h5>
+            <h5 class="mb-20">Title: {{ postDetail.title | titlecase }}</h5>
+            <p>User ID: {{ postDetail.userId }}</p>
+            <p>Body: {{ postDetail.body }}</p>
+
+            <app-comments></app-comments>
+
+        </div>
+
+    </div>
+</div>
