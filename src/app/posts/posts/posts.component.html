@@ -32,9 +32,12 @@
                                         remove_red_eye
                                     </mat-icon>
 
+                                    
                                     <mat-icon (click)="handleDelete( post.id )" aria-hidden="false" matTooltip="Delete Post" class="trash cursor mr-5" aria-label="Delete Post">delete</mat-icon>
-
+                                    
                                     <mat-icon aria-hidden="false" data-bs-toggle="modal" data-bs-target="#addPost" (click)="handleUpdate(post)" matTooltip="Edit Post" class="cursor pen" aria-label="Update Post">edit</mat-icon>
+                                    
+                                    <mat-icon class="ml-5 cursor comment" matTooltip="View Comments" [matBadge]="post.commentLength" matBadgeColor="warn">comment</mat-icon>
                                 </td>
                             </tr>
                         </ng-container>

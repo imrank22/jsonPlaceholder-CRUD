@@ -8,6 +8,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import { DetailPostComponent } from './detail-post/detail-post.component';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { CommentsComponent } from './comments/comments.component';
+import {MatBadgeModule} from '@angular/material/badge';
+
 
 const routes: Routes = [
   {
@@ -33,7 +35,8 @@ const routes: Routes = [
     MatIconModule,
     ReactiveFormsModule,
     MatTooltipModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatBadgeModule
   ]
 })
 export class PostsModule { }

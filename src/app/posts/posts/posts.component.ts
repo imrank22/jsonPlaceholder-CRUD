@@ -22,7 +22,7 @@ export class PostsComponent implements OnInit {
     userId: [ '', [ Validators.required, Validators.pattern(/^[0-9]*$/) ] ],
   })
 
-  constructor( private post: CommonService, private _fb: FormBuilder, private _snackbar: MatSnackBar ) { }
+  constructor( private postService: CommonService, private _fb: FormBuilder, private _snackbar: MatSnackBar ) { }
 
   ngOnInit(): void {
     this.fetchPosts()
@@ -33,7 +33,18 @@ export class PostsComponent implements OnInit {
   get body(){ return this.addPost.get('body') }
 
   fetchPosts(){
-    this.post.getListOfPosts$().subscribe((data: Post[])=> this.posts = data.splice(0, 4))
+    this.postService.getListOfPosts$().subscribe((data: Post[])=>{
+      this.posts = data.splice(0, 4)
+      this.posts.map(post =>{
+
+        //fetching number of comments for each post
+        this.postService.getCommentsForPost$(post.id).subscribe(res=>{
+          post.commentLength = res.length
+        })
+        return post
+      })
+      console.log(this.posts)
+    })
   }
 
   handleDelete(postId: number){
@@ -41,7 +52,7 @@ export class PostsComponent implements OnInit {
   }
 
   handleSearch(){
-    this.post.getListOfPosts$().subscribe((data: Post[])=> this.posts = data.splice(0,4).filter(post => post.title.includes(this.search.toLowerCase())))
+    this.postService.getListOfPosts$().subscribe((data: Post[])=> this.posts = data.splice(0,4).filter(post => post.title.includes(this.search.toLowerCase())))
   }
 
   handleSort(){
