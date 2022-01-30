@@ -1,7 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Comment } from 'src/app/interfaces/comment.interface';
 import { CommonService } from 'src/app/services/common.service';
 
@@ -10,12 +11,14 @@ import { CommonService } from 'src/app/services/common.service';
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.scss']
 })
-export class CommentsComponent implements OnInit {
+export class CommentsComponent implements OnInit, OnDestroy {
 
-  comments: Comment[] = []
-  postId: number = 0
-  isUpdating: boolean = false
+  subscriptions$ :   Subscription[] = []
+  comments:          Comment[] = []
+  postId:            number = 0
+  isUpdating:        boolean = false
   selectedCommentId: number = 0
+
   addComment = this._fb.group({
     name: [ '', [ Validators.required, Validators.pattern(/^[a-zA-Z0-9 ]*$/), Validators.minLength(5), Validators.maxLength(30) ] ],
     body: [ '', [ Validators.required, Validators.pattern(/^[a-zA-Z0-9 ]*$/), Validators.minLength(10), Validators.maxLength(100) ] ],
@@ -24,25 +27,27 @@ export class CommentsComponent implements OnInit {
 
   constructor( private commentService: CommonService, private route: ActivatedRoute, 
     private _fb: FormBuilder, private _snackbar: MatSnackBar ) {
-    route.params.subscribe(params => this.postId = params['id'])
   }
-
+    
   ngOnInit(): void {
+    let subscription = this.route.params.subscribe(params => this.postId = params['id']);
+    this.subscriptions$.push(subscription);
     this.fetchComments()
   }
   
   get name(){ return this.addComment.get('name') }
   get body(){ return this.addComment.get('body') }
   get email(){ return this.addComment.get('email') }
-
+  
   fetchComments(){
-    this.commentService.getCommentsForPost$(this.postId).subscribe((data: Comment[]) => this.comments = data)
+    let subscription = this.commentService.getCommentsForPost$(this.postId).subscribe((data: Comment[]) => this.comments = data)
+    this.subscriptions$.push(subscription);
   }
-
+  
   handleDeleteComment( commentID: number ){
     this.comments = this.comments.filter(comment => comment.id !== commentID)
   }
-
+  
   handleUpdate(comment: Comment){
     this.isUpdating = true;
     (<HTMLInputElement>document.getElementById('email')).readOnly = true;
@@ -53,13 +58,13 @@ export class CommentsComponent implements OnInit {
       email: comment.email
     })
   }
-
+  
   resetUpdate(){
     this.isUpdating = false;
     (<HTMLInputElement>document.getElementById('email')).readOnly = false;
     this.addComment.reset()
   }
-
+  
   handleAddComment(){
     let payload = {
       id: this.isUpdating ? this.selectedCommentId : Math.floor(Math.random() * 100),
@@ -83,6 +88,10 @@ export class CommentsComponent implements OnInit {
     let message = this.isUpdating ? 'Comment updated successfully' : 'Comment added successfully'
     this._snackbar.open(message, 'OK', { duration: 3000 })
     this.isUpdating = false
+  }
+  
+  ngOnDestroy(): void {
+    this.subscriptions$.forEach(subscription => subscription.unsubscribe())
   }
 
 }
