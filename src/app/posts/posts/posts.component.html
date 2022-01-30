@@ -2,10 +2,21 @@
     <div class="row text-center w-60 m-auto">
         <div class="d-flex align-items-center justify-content-between">
             <h3 class="text-center">List of Posts</h3>
-            <input type="text" placeholder="Search Post" autocomplete="off" class="w-30" name="search" [(ngModel)]="search" (keyup)="handleSearch()">
+            <input type="text" *ngIf="isPostsLoaded" placeholder="Search Post" autocomplete="off" class="w-30" name="search" [(ngModel)]="search" (keyup)="handleSearch()">
         </div>
 
-        <div class="col-md-12">
+        <div *ngIf="!isPostsLoaded" class="white-bg d-grid  mt-10 fetch-post">
+            <button *ngIf="!showLoader" class="ripple primary-btn" (click)="fetchPosts()" matTooltip="Click here to get list of Posts">Get List of Posts</button>
+            <img
+                *ngIf="showLoader"
+                class="api-loader mr-10"
+                src="assets/images/Dual Ring-1s-200px.svg"
+                alt="spinner"
+                loading="lazy"
+            />
+        </div>
+
+        <div class="col-md-12" *ngIf="isPostsLoaded">
             <div class="table">
                 <table class="gfg w-100">
                     <thead>
@@ -37,7 +48,7 @@
                                     
                                     <mat-icon aria-hidden="false" data-bs-toggle="modal" data-bs-target="#addPost" (click)="handleUpdate(post)" matTooltip="Edit Post" class="cursor pen" aria-label="Update Post">edit</mat-icon>
                                     
-                                    <mat-icon class="ml-5 cursor comment" matTooltip="View Comments" [matBadge]="post.commentLength" matBadgeColor="warn">comment</mat-icon>
+                                    <mat-icon class="ml-5 cursor comment" matTooltip="View Comments" [matBadge]="post.commentLength" matBadgeColor="warn" [routerLink]="['/posts', post.id]">comment</mat-icon>
                                 </td>
                             </tr>
                         </ng-container>
